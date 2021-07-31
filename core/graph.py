@@ -1,11 +1,15 @@
+from collections import defaultdict
+
 from utils import get_time_delta, MIN_LAYOVER_HRS, MAX_LAYOVER_HRS, LAYOVER_OK
 
 
 class Graph:
-    def __init__(self, bags_count):
+    def __init__(self, bags_count, src, dst):
         self.nodes = {}
         self.paths = []
         self.bags_count = bags_count
+        self.orig_src = src
+        self.orig_dst = dst
 
     def create_graph(self, flights):
         for flight in flights:
@@ -22,12 +26,16 @@ class Graph:
             for edge in node.edges:
                 print(f"{edge.flight_info['origin']} -> {edge.flight_info['destination']}")
 
-    def search(self, src, dst, visited, paths, flight_info):
+    def search(self, src, dst, visited, path, flight_info, return_trip):
         visited[src] = True
         if flight_info:
-            paths.append(flight_info)
+            path.append(flight_info)
         if src == dst:
-            self.paths.append(paths[:])
+            if return_trip:
+                self.search(self.nodes[self.orig_dst], self.nodes[self.orig_src], defaultdict(lambda: False), path[:-1],
+                            flight_info, False)
+            else:
+                self.paths.append(path[:])
         else:
             for edge in src.edges:
                 if flight_info:
@@ -37,9 +45,9 @@ class Graph:
                 is_layover_time_in_interval = (MIN_LAYOVER_HRS <= layover_time_hrs <= MAX_LAYOVER_HRS)
                 are_all_bags_allowed = edge.flight_info["bags_allowed"] >= self.bags_count
                 if are_all_bags_allowed and is_layover_time_in_interval and not visited[edge.dst]:
-                    self.search(edge.dst, dst, visited, paths, edge.flight_info)
+                    self.search(edge.dst, dst, visited, path, edge.flight_info, return_trip)
         if flight_info:
-            paths.pop()
+            path.pop()
         visited[src] = False
 
 
@@ -51,9 +59,15 @@ class Node:
     def add_edge(self, data, dst):
         self.edges.append(Edge(data, self, dst))
 
+    def __str__(self):
+        return self.name
+
 
 class Edge:
     def __init__(self, flight_info_input, src, dst):
         self.flight_info = flight_info_input
         self.src = src
         self.dst = dst
+
+    def __str__(self):
+        return f"{self.src} -> {self.dst}"

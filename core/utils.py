@@ -4,6 +4,7 @@ MIN_LAYOVER_HRS = 1
 MAX_LAYOVER_HRS = 6
 LAYOVER_OK = 1
 
+
 def get_time_delta(arrival, departure, hrs=False, sec=False, reversed=False):
     arrival = datetime.strptime(arrival, "%Y-%m-%dT%H:%M:%S")
     departure = datetime.strptime(departure, "%Y-%m-%dT%H:%M:%S")

@@ -6,7 +6,7 @@ from utils import get_time_delta
 
 
 def solve(flights, src, dst, bags_count, return_trip):
-    graph = Graph(bags_count)
+    graph = Graph(bags_count, src, dst)
     graph.create_graph(flights)
     if src not in graph.nodes:
         return -1
@@ -17,15 +17,18 @@ def solve(flights, src, dst, bags_count, return_trip):
 
 def calc_travel_time(path):
     sum_seconds = 0
+    prev = None
     for flight in path:
+        if prev:
+            sum_seconds += get_time_delta(flight["departure"], prev, sec=True, reversed=True)
         sum_seconds += get_time_delta(flight["arrival"], flight["departure"], sec=True, reversed=True)
+        prev = flight["arrival"]
     return str(datetime.timedelta(seconds=sum_seconds))
 
 
 def find_all_paths(graph, src, dst, return_trip):
-    visited = defaultdict(lambda: False)
-    paths = []
-    graph.search(graph.nodes[src], graph.nodes[dst], visited, paths, None)
+    graph.search(graph.nodes[src], graph.nodes[dst], defaultdict(lambda: False), [], None, return_trip)
+
     res = []
     for path in graph.paths:
         path_obj = {
