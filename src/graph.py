@@ -6,7 +6,7 @@ from utils import get_time_delta, MIN_LAYOVER_HRS, MAX_LAYOVER_HRS, LAYOVER_OK
 class Graph:
     """
     Represents airports as nodes and edges as flights between two airports.
-    Directed oriented multigraph.
+    Directed cyclic multigraph.
     """
 
     def __init__(self, bags_count, src, dst):

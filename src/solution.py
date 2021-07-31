@@ -1,6 +1,6 @@
 # Author: Martin Melisek
 # Date: 31.7.2021
-# Find all flight combinations for a selected route between airports A -> B, sorted by fianl price for the trip
+# Find all flight combinations for a selected route between airports A -> B, sorted by final price for the trip
 # Results are printed to stdout
 # Usage: python -m solution <CSV FILE> <ORIGIN_AIRPORT_CODE> <DESTINATION_AIRPORT_CODE> [--bags=<BAG_COUNT>] [--return]
 # Example: python -m solution data.csv DHE NIZ --bags=2 --return
