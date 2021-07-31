@@ -1,4 +1,5 @@
 import datetime
+import json
 from collections import defaultdict
 
 from graph import Graph
@@ -27,7 +28,7 @@ def calc_travel_time(path):
 
 
 def find_all_paths(graph, src, dst, return_trip):
-    graph.search(graph.nodes[src], graph.nodes[dst], defaultdict(lambda: False), [], None, return_trip)
+    graph.search(graph.nodes[src], graph.nodes[dst], defaultdict(lambda: False), [], None, return_trip, True)
 
     res = []
     for path in graph.paths:
@@ -44,4 +45,4 @@ def find_all_paths(graph, src, dst, return_trip):
         }
         res.append(path_obj)
 
-    return sorted(res, key=lambda x: x["total_price"])
+    return json.dumps(sorted(res, key=lambda x: x["total_price"]))
