@@ -20,11 +20,11 @@ class Graph:
 
             self.nodes[flight["origin"]].add_edge(flight, self.nodes[flight["destination"]])
 
-    def print_graph(self):
+    def print_edges(self):
         for node_src, node in self.nodes.items():
-            print("SRC: ", node_src)
+            print(node_src)
             for edge in node.edges:
-                print(f"{edge.flight_info['origin']} -> {edge.flight_info['destination']}")
+                print(edge)
 
     def search(self, src, dst, visited, path, flight_info, return_trip, layover_enabled):
         visited[src] = True

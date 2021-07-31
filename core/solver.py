@@ -9,10 +9,12 @@ from utils import get_time_delta
 def solve(flights, src, dst, bags_count, return_trip):
     graph = Graph(bags_count, src, dst)
     graph.create_graph(flights)
+
     if src not in graph.nodes:
         return -1
     if dst not in graph.nodes:
         return -2
+
     return find_all_paths(graph, src, dst, return_trip)
 
 

@@ -29,9 +29,11 @@ if __name__ == "__main__":
     except TypeError as e:
         print_arg_error("Error: Corrupted CSV file", e)
         exit(-5)
+
     q = timeit.default_timer()
     solution = solve(flights, src, dst, bags, return_trip)
     print(timeit.default_timer() - q)
+
     if solution == -1:
         print_arg_error("Error: ORIGIN airport code was not found in input CSV file.")
         exit(-6)
