@@ -6,8 +6,10 @@ def parse_args(argv):
     bags = 0
     return_trip = False
     for argument in argv[4:]:
-        if "--bags" in argument:
+        if "--bags=" in argument:
             bags = int(argument.split("=")[1])
+            if bags < 0:
+                raise ValueError("Entered value for argument '--bags' is negative.")
         elif argument == "--return":
             return_trip = True
     return file_path, src, dst, bags, return_trip
@@ -16,4 +18,4 @@ def parse_args(argv):
 def print_arg_error(description, exception_msg=None):
     print(description, file=stderr)
     if exception_msg:
-        print("Details:\n", exception_msg)
+        print("Details:\n", exception_msg, file=stderr)
