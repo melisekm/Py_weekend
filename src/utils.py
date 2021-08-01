@@ -54,6 +54,7 @@ def print_arg_error(description, exception_msg=None):
 def read_csv(path):
     """
     Reads csv file and changes base_price, bag_price and bags_allowed columns to corresponding data types
+    Sorts the resulting list by departure time, if it was not sorted before
     @param path: path to the csv file
     @return: list of dictionaries with keys as columns and values as fields - each dictionary is one flight
     @raise ValueError: if csv file contains illegal collumns
@@ -86,6 +87,13 @@ def read_csv(path):
     except TypeError as e:
         print_arg_error("Error: Corrupted CSV file", e)
         sys.exit(-5)
+
+    # checks if list of flights is sorted based on departure, if not sorts it
+    # later on, it helps us to prune search space
+    # so we can eliminate flights with very high layover and skip them immediately
+    if not all(res[i]["departure"] <= res[i + 1]["departure"] for i in range(len(res) - 1)):
+        res.sort(key=lambda x: x["departure"])
+
     return res
 
 

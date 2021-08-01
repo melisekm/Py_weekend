@@ -6,7 +6,7 @@ from utils import get_time_delta, MIN_LAYOVER_HRS, MAX_LAYOVER_HRS, LAYOVER_OK
 class Graph:
     """
     Represents airports as nodes and edges as flights between two airports.
-    Directed cyclic multigraph.
+    Directed cyclic multigraph.(Multidigraph)
     """
 
     def __init__(self, bags_count, src, dst):
@@ -46,7 +46,7 @@ class Graph:
         @param path: list of flights in currently constructed path
         @param flight_info: info about latest added path
         @param return_trip: if during currrent recursive iteration we search for return trip from the destination
-        @param layover_enabled: if we care about layover interval time.
+        @param layover_enabled: if we apply layover interval time rules.
         We do not, if we have just arrived to the final destination and we are on a return trip.
         """
         visited[src] = True
@@ -69,8 +69,8 @@ class Graph:
                 if not layover_enabled:
                     is_layover_time_in_interval = layover_time_hrs > 0
                 else:
-                    if layover_time_hrs > MAX_LAYOVER_HRS:  # FIXME treba sa uistit ze je zoznam sortnuty/sortnut ho
-                        break  # az 40% performance increase
+                    if layover_time_hrs > MAX_LAYOVER_HRS:  # skip any flights with very long layover
+                        break
                     is_layover_time_in_interval = MIN_LAYOVER_HRS <= layover_time_hrs <= MAX_LAYOVER_HRS
 
                 are_all_bags_allowed = edge.flight_info["bags_allowed"] >= self.bags_count
@@ -101,9 +101,6 @@ class Node:
         """
         self.edges.append(Edge(data, self, dst))
 
-    def __str__(self):
-        return self.name
-
 
 class Edge:
     """
@@ -114,6 +111,3 @@ class Edge:
         self.flight_info = flight_info_input
         self.src = src
         self.dst = dst
-
-    def __str__(self):
-        return f"{self.src} -> {self.dst}"

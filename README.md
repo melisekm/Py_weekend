@@ -66,7 +66,7 @@ Basically, we generate all possible paths from A and check whether they end up i
 we can immediately stop when the layover time exceeds 6 hours**. 
 It is not infinite because we are looking only for simple paths  
 Discussion on the complexity of this problem can be extensive, because if we think about it we have multidigraph where edges have their own identity.
-We visit every vertex more than once and we have to try every possibility. Easly we can come up with [scenario](https://stackoverflow.com/a/75941/)
+We visit every vertex more than once and we have to try every possibility. Easly we can come up with scenario
 where eventhough the simple path is clear, our algorithm has to explore every possible path which _may_ end up in goal node. Thus having complexity of **O(V!)**, 
 but imagine this situation(not talking about flights, but graph in general):
 We have three nodes. A B and C, we want to find all simple paths A - > C. There is only one path from B to C, but from A to B there is huge amount of paths. 
