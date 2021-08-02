@@ -38,6 +38,10 @@ def parse_args():
                             dest="return_trip")
 
     args = arg_parser.parse_args()
+    if args.origin == args.destination:
+        print_arg_error("Error: origin and destination airport can not be the same.")
+        sys.exit(1)
+        
     return args.csv_file, args.origin, args.destination, args.bags, args.return_trip
 
 
