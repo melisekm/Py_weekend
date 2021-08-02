@@ -1,3 +1,4 @@
+import argparse
 import csv
 import sys
 from datetime import datetime
@@ -7,10 +8,9 @@ MAX_LAYOVER_HRS = 6
 LAYOVER_OK = 1  # explicit value so we dont calculate non existent layover
 
 
-def parse_args(argv):
+def parse_args():
     """
-    Parses program arguments from list of command line arguments.
-    @param argv: list of arguments
+    Parses program arguments from command line arguments.
     @return: tuple of parsed arguments ->
         file path of CSV file: str,
         origin airport code: str,
@@ -20,24 +20,27 @@ def parse_args(argv):
     @raise ValueError: if value of argument --bags was negative
     @raise TypeError: if value of argument --bags was invalid
     """
-    bags = 0
-    return_trip = False
-    try:
-        file_path, src, dst = argv[1], argv[2], argv[3]  # required args
-        for argument in argv[4:]:
-            if "--bags=" in argument:
-                bags = int(argument.split("=")[1])  # structure of argument is --bags=X where X is positive integer
-                if bags < 0:
-                    raise ValueError("Entered value for argument '--bags' is negative.")
-            elif argument == "--return":
-                return_trip = True
-    except ValueError as e:
-        print_arg_error("Error: Missing positive integer number for parameter --bags", e)
-        sys.exit(-1)
-    except IndexError as e:
-        print_arg_error("Error: Missing required arguments", e)
-        sys.exit(-2)
-    return file_path, src, dst, bags, return_trip
+
+    def non_negative_int(x):
+        i = int(x)
+        if i < 0:
+            raise ValueError('Negative values are not allowed')
+        return i
+
+    program_description = "Find all flight combinations for a selected route between airports A -> B, " \
+                          "sorted by final price for the trip"
+    epilog = "example: python -m solution data.csv DHE NIZ --bags=2 --return"
+
+    arg_parser = argparse.ArgumentParser(description=program_description, epilog=epilog)
+    arg_parser.add_argument("csv_file", help="File path of input CSV file", type=argparse.FileType())
+    arg_parser.add_argument("origin", help="Origin airport code")
+    arg_parser.add_argument("destination", help="Destination airport code")
+    arg_parser.add_argument("--bags", default=0, help="Number of requested bags", type=non_negative_int)
+    arg_parser.add_argument("--return", action="store_true", default=False, help="Is it a return flight?",
+                            dest="return_trip")
+
+    args = arg_parser.parse_args()
+    return args.csv_file, args.origin, args.destination, args.bags, args.return_trip
 
 
 def print_arg_error(description, exception_msg=None):
@@ -51,33 +54,31 @@ def print_arg_error(description, exception_msg=None):
         print("Details:\n", exception_msg, file=sys.stderr)
 
 
-def read_csv(path):
+def read_csv(csv_file):
     """
     Reads csv file and changes base_price, bag_price and bags_allowed columns to corresponding data types
     Sorts the resulting list by departure time, if it was not sorted before
-    @param path: path to the csv file
+    @param csv_file: handle to opened csv file: _io.TextIOWrapper
     @return: list of dictionaries with keys as columns and values as fields - each dictionary is one flight
     @raise ValueError: if csv file contains illegal collumns
     @raise FileNotFoundError: if csv file does not exist.
     @raise TypeError: if one of the changed columns contains illegal value
     """
-
     # csv file has to contain these columns
     allowed_columns = [
         'flight_no', 'origin', 'destination', 'departure',
         'arrival', 'base_price', 'bag_price', 'bags_allowed'
     ]
     try:
-        with open(path, "r") as csv_file:
-            csv_reader = csv.DictReader(csv_file)
-            if csv_reader.fieldnames != allowed_columns:
-                raise ValueError("CSV file contains illegal collumns.")
-            res = []
-            for row in csv_reader:
-                row["base_price"] = float(row["base_price"])  # we do this to simplify manipulating with those fields
-                row["bag_price"] = float(row["bag_price"])  # in later stages of solution
-                row["bags_allowed"] = int(row["bags_allowed"])  # see core.solver.find_all_paths
-                res.append(row)
+        csv_reader = csv.DictReader(csv_file)
+        if csv_reader.fieldnames != allowed_columns:
+            raise ValueError("CSV file contains illegal collumns.")
+        res = []
+        for row in csv_reader:
+            row["base_price"] = float(row["base_price"])  # we do this to simplify manipulating with those fields
+            row["bag_price"] = float(row["bag_price"])  # in later stages of solution
+            row["bags_allowed"] = int(row["bags_allowed"])  # see solver.find_all_paths
+            res.append(row)
     except ValueError as e:
         print_arg_error("Error: CSV file error", e)
         sys.exit(-3)
@@ -87,6 +88,8 @@ def read_csv(path):
     except TypeError as e:
         print_arg_error("Error: Corrupted CSV file", e)
         sys.exit(-5)
+
+    csv_file.close()
 
     # checks if list of flights is sorted based on departure, if not sorts it
     # later on, it helps us to prune search space

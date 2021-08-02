@@ -5,13 +5,11 @@
 # Usage: python -m solution <CSV FILE> <ORIGIN_AIRPORT_CODE> <DESTINATION_AIRPORT_CODE> [--bags=<BAG_COUNT>] [--return]
 # Example: python -m solution data.csv DHE NIZ --bags=2 --return
 
-import sys
-
 from solver import solve
 from utils import parse_args, read_csv
 
 if __name__ == "__main__":
-    file_path, src, dst, bags, return_trip = parse_args(sys.argv)
-    flights = read_csv(file_path)
+    csv_file, src, dst, bags, return_trip = parse_args()
+    flights = read_csv(csv_file)
     solution = solve(flights, src, dst, bags, return_trip)
     print(solution)
