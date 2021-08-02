@@ -1,5 +1,6 @@
 import datetime
 import json
+import sys
 from collections import defaultdict
 
 from graph import Graph
@@ -21,10 +22,10 @@ def solve(flights, src, dst, bags_count, return_trip):
 
     if src not in graph.nodes:
         print_arg_error("Error: ORIGIN airport code was not found in input CSV file.")
-        exit(-6)
+        sys.exit(1)
     if dst not in graph.nodes:
         print_arg_error("Error: DESTINATION airport code was not found in input CSV file.")
-        exit(-7)
+        sys.exit(1)
 
     return find_all_paths(graph, src, dst, return_trip)
 

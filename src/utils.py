@@ -11,14 +11,12 @@ LAYOVER_OK = 1  # explicit value so we dont calculate non existent layover
 def parse_args():
     """
     Parses program arguments from command line arguments.
-    @return: tuple of parsed arguments ->
-        file path of CSV file: str,
-        origin airport code: str,
-        destination airport code: str,
-        maximum allowed bags: int,
-        true/false if the program should include return trip: boolean
-    @raise ValueError: if value of argument --bags was negative
-    @raise TypeError: if value of argument --bags was invalid
+    @return: tuple of parsed arguments.
+        file handle to csv file: TextIOWrapper.
+        origin airport code: str.
+        destination airport code: str.
+        maximum allowed bags: int.
+        true/false if the program should include return trip: boolean.
     """
 
     def non_negative_int(x):
@@ -81,13 +79,10 @@ def read_csv(csv_file):
             res.append(row)
     except ValueError as e:
         print_arg_error("Error: CSV file error", e)
-        sys.exit(-3)
-    except FileNotFoundError as e:
-        print_arg_error("Error: CSV file does not exist.", e)
-        sys.exit(-4)
+        sys.exit(1)
     except TypeError as e:
         print_arg_error("Error: Corrupted CSV file", e)
-        sys.exit(-5)
+        sys.exit(1)
 
     csv_file.close()
 
